@@ -1,7 +1,6 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from app.api import schemas
 from app.db import models
-from app.api.endpoints.errors.models import CurrencyExchangeError
 from app.utils.unitofwork import IUnitOfWork
 
 
