@@ -1,7 +1,7 @@
 import datetime
 
-from sqlalchemy import BigInteger, SmallInteger, DateTime, func, String, Boolean, ForeignKey, UniqueConstraint
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy import BigInteger, SmallInteger, DateTime, func, String, Boolean, ForeignKey
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
@@ -18,7 +18,6 @@ class User(Base):  # обязательно наследуем все модел
     password: Mapped[str] = mapped_column(String, nullable=True)
     roles: Mapped[tuple[Role]] = mapped_column(ARRAY(SmallInteger), nullable=True)
     logged: Mapped[bool] = mapped_column(Boolean, nullable=True, default=False)
-    tokens: Mapped[list['TokenData'] | None] = relationship("TokenData", back_populates="user")
     tasks: Mapped[list['Task'] | None] = relationship("Task", back_populates="user")
 
 
@@ -32,19 +31,3 @@ class Task(Base):
     user: Mapped[User | None] = relationship("User", back_populates="tasks")
     completed: Mapped[bool] = mapped_column(Boolean, nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=True, default=func.now())
-
-
-class TokenData(Base):
-    __tablename__ = "tokenData"
-    __table_args__ = (
-        UniqueConstraint("user_id", "fingerprint"),
-    )
-    id: Mapped[int | None] = mapped_column(BigInteger, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    user: Mapped[User | None] = relationship("User", back_populates="tokens")
-    refresh_token_uuid: Mapped[UUID] = mapped_column(UUID, nullable=True, unique=True)
-    refresh_token: Mapped[str] = mapped_column(String, nullable=True, unique=True)
-    fingerprint: Mapped[str] = mapped_column(String, nullable=False, unique=False)
-    expires_in: Mapped[int] = mapped_column(BigInteger, nullable=False)
-    created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=func.now())
-

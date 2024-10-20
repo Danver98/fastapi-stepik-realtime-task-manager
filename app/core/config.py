@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     JWT_REFRESH_SECRET_KEY: str
     USER_PASSWORD_SALT: str
     REFRESH_TOKEN_PASSWORD_SALT: str
+    REDIS_URL: str
 
 
     @property

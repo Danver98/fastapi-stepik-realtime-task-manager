@@ -11,3 +11,13 @@ async def user_registration_error_handler(_: Request, ex: UserRegistrationError)
             'message': ex.message
         }
     )
+
+
+async def redis_error_handler(_: Request, ex: Exception) -> JSONResponse:
+    """Redis error handler"""
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            'message': 'Redis error: ' + str(ex)
+        }
+    )

@@ -15,9 +15,11 @@ from .config import settings
 
 ALGORITHM = "HS256" # плюс в реальной жизни мы устанавливаем "время жизни" токена
 EXPIRATION_TIME = timedelta(minutes=30)
-REFRESH_TOKEN_EXPIRATION_TIME = timedelta(days=1)
+REFRESH_TOKEN_EXPIRATION_TIME = timedelta(days=2)
 REFRESH_TOKEN_HEADER = 'X-Refresh-Token'
 FINGERPRINT_HEADER = 'X-Fingerprint'
+REDIS_USERS_TOKEN_DATA_KEY = 'users_token_data'
+MAX_CONCURRENT_USER_SESSIONS = 5
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 

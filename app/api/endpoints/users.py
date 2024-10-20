@@ -1,10 +1,11 @@
 from typing import Annotated
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Response, Request, status
+from redis.asyncio import Redis
+from fastapi import APIRouter, Depends, Request
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_async_session
+from app.db.redis import get_redis_async_session
 from app.api.schemas.user import UserRegister, User
 from app.services.auth_service import AuthService
 from app.core.security import get_current_user, FINGERPRINT_HEADER, REFRESH_TOKEN_HEADER
@@ -17,7 +18,13 @@ auth_router = APIRouter(
 
 
 def get_auth_service(session: AsyncSession = Depends(get_async_session)) -> AuthService:
+    """Get auth service"""
     return AuthService(session)
+
+def get_auth_service_with_redis(session: AsyncSession = Depends(get_async_session),
+                                redis_session: Redis = Depends(get_redis_async_session)) -> AuthService:
+    """Get auth service with Redis"""
+    return AuthService(session, redis_session)
 
 
 @auth_router.post('/register')
@@ -31,7 +38,7 @@ async def register_user(request: Request,
 @auth_router.post('/login')
 async def login_user(request: Request,
                      data: Annotated[OAuth2PasswordRequestForm, Depends()],
-                     auth_service: AuthService = Depends(get_auth_service)):
+                     auth_service: AuthService = Depends(get_auth_service_with_redis)):
     access_token, refresh_token, fingerprint = await auth_service.login(data, request.headers.get(FINGERPRINT_HEADER))
     #response.headers['Authentication'] = 'Bearer ' + token
     return {
@@ -46,7 +53,7 @@ async def login_user(request: Request,
 @auth_router.post('/logout')
 async def logout_user(request: Request,
                       current_user: Annotated[User, Depends(get_current_user)],
-    auth_service: AuthService = Depends(get_auth_service)) -> dict:
+    auth_service: AuthService = Depends(get_auth_service_with_redis)) -> dict:
     await auth_service.logout(current_user.login, request.headers.get(FINGERPRINT_HEADER))
     return {
         'user': current_user.login,
@@ -57,7 +64,7 @@ async def logout_user(request: Request,
 @auth_router.post('/reissue-tokens/{login}')
 async def reissue_tokens(request: Request,
                          login: str,
-                         auth_service: AuthService = Depends(get_auth_service)) -> dict:
+                         auth_service: AuthService = Depends(get_auth_service_with_redis)) -> dict:
     """Reissue tokens method"""
     access_token, refresh_token, fingerprint = await auth_service.reissue_tokens(
         login,

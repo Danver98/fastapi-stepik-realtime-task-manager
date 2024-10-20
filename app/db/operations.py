@@ -56,28 +56,3 @@ async def logout_user(session: AsyncSession, login: str) -> models.User:
     await session.commit()
     return
 
-
-async def get_refresh_token(session: AsyncSession, login: str, fingerprint: str) -> models.TokenData:
-    """Get refresh token"""
-    subquery = select(func.max(models.User.id)).where(models.User.login == login)
-    query = select(models.TokenData).where(models.TokenData.user_id == subquery.scalar_subquery(),
-                                           models.TokenData.fingerprint == fingerprint)
-    result = await session.scalars(query)
-    return result.first()
-
-
-async def update_refresh_token(session: AsyncSession, old_refresh_token: models.TokenData, new_refresh_token: models.TokenData):
-    """Create/update refresh token"""
-    if old_refresh_token:
-        await session.execute(delete(models.TokenData).where(models.TokenData.id == old_refresh_token.id))
-    session.add(new_refresh_token)
-    await session.commit()
-
-
-async def delete_refresh_token(session: AsyncSession, login: str, fingerprint: str):
-    """Create/update refresh token"""
-    subquery = select(func.max(models.User.id)).where(models.User.login == login)
-    statement = delete(models.TokenData).where(models.TokenData.user_id == subquery.scalar_subquery(),
-                                               models.TokenData.fingerprint == fingerprint)
-    await session.execute(statement)
-    await session.commit()
