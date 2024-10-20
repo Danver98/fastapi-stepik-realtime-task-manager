@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    """Settings for application"""
     DB_HOST: str
     DB_PORT: str
     DB_USER: str
@@ -24,6 +25,7 @@ class Settings(BaseSettings):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     class Config:
+        """Config for application"""
         # Setup your own .env file with credentials or take them from environmental variables
         env_file = ".env"
 
