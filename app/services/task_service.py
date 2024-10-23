@@ -43,7 +43,7 @@ class TaskService:
 
     async def update(self, task: schemas.Task) -> schemas.Task:
         """Update task"""
-        db_task = task.model_dump(exclude_unset=True)
+        db_task = task.model_dump(exclude_unset=True, exclude={'user_id', 'user', 'created_at'})
         async with self.uow:
             db_task = await self.uow.task.update(db_task)
             task = self._get_task_from_db_object(db_task)

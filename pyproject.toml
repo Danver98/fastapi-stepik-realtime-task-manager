@@ -2,3 +2,4 @@
 env = [
     "TASK_MANAGER_APP_STAGE=test",
 ]
+asyncio_mode = "auto"
