@@ -24,11 +24,14 @@ async_session_maker = async_sessionmaker(engine, class_=AsyncSession)
 pool = ConnectionPool.from_url(settings.REDIS_URL)
 
 
-@pytest_asyncio.fixture(scope="session")
-def event_loop(request):
+@pytest_asyncio.fixture(autouse=True, scope="session")
+async def event_loop(request):
     """Create an instance of the default event loop.. Hack when starting all tests at once"""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
+    redis = Redis(connection_pool=pool, decode_responses=True)
+    await redis.flushdb()
+    await redis.aclose()
     loop.close()
 
 
@@ -41,14 +44,6 @@ async def prepare_database():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
 
-@pytest_asyncio.fixture(autouse=True, scope="session")
-async def clear_redis():
-    """Clear redis sessions"""
-    yield
-    redis = Redis(connection_pool=pool, decode_responses=True)
-    redis.flushdb()
-    redis.close()
-
 
 async def get_async_session_override() -> AsyncIterator[AsyncSession]:
     """Override async session for tests"""
@@ -60,7 +55,7 @@ async def get_redis_async_session_override() -> AsyncIterator[Redis]:
     """Override async redis session for tests"""
     redis = Redis(connection_pool=pool, decode_responses=True)
     yield redis
-    await redis.close()
+    await redis.aclose()
 
 
 app.dependency_overrides[get_async_session] = get_async_session_override
