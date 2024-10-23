@@ -1,4 +1,4 @@
-from sqlalchemy import select, update, func, delete
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from asyncpg.exceptions import UniqueViolationError
@@ -55,4 +55,3 @@ async def logout_user(session: AsyncSession, login: str) -> models.User:
     await session.execute(statement)
     await session.commit()
     return
-

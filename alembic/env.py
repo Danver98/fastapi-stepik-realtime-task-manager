@@ -7,7 +7,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.core.config import settings
-from app.db.database import Base
+from app.db.base import Base
 
 
 # Тут добавили в пути нашу папку app, чтобы алембик её увидел.

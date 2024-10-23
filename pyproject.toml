@@ -1,0 +1,4 @@
+[tool.pytest.ini_options]
+env = [
+    "TASK_MANAGER_APP_STAGE=test",
+]

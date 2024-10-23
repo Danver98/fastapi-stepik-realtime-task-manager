@@ -1,8 +1,11 @@
+import os
+from functools import lru_cache
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """Settings for application"""
+    BASE_URL: str
     DB_HOST: str
     DB_PORT: str
     DB_USER: str
@@ -29,5 +32,38 @@ class Settings(BaseSettings):
         # Setup your own .env file with credentials or take them from environmental variables
         env_file = ".env"
 
+class DevSettings(Settings):
+    """Settings for development environment"""
+    class Config:
+        """Config for development environment"""
+        env_file = ".dev.env"
 
-settings = Settings()
+
+class TestSettings(Settings):
+    """Settings for testing environment"""
+    class Config:
+        """Config for testing environment"""
+        env_file = ".test.env"
+
+
+class ProdSettings(Settings):
+    """Settings for production environment"""
+    class Config:
+        """Config for production environment"""
+        env_file = ".prod.env"
+
+
+@lru_cache()
+def get_settings():
+    """Get settings for current environment"""
+    app_stage = os.getenv("TASK_MANAGER_APP_STAGE", None)
+    if app_stage == "dev":
+        return DevSettings()
+    if app_stage == "test":
+        return TestSettings()
+    if app_stage == "prod":
+        return ProdSettings()
+    return Settings()
+
+
+settings = get_settings()

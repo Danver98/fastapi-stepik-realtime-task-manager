@@ -4,14 +4,15 @@ from sqlalchemy import BigInteger, SmallInteger, DateTime, func, String, Boolean
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.db.database import Base
+from app.db.base import Base
 from app.api.schemas.user import Role
 
 
-class User(Base):  # обязательно наследуем все модели от нашей Base-метатаблицы
-    __tablename__ = "users"  # Указываем как будет называться наша таблица в базе данных (пишется в ед. числе)
+class User(Base):
+    """User model"""
+    __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)  # Строка  говорит, что наша колонка будет интом, но уточняет, что ещё и большим интом (актуально для ТГ-ботов), первичным ключом и индексироваться
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
     login: Mapped[str]  = mapped_column(String, nullable=False, unique=True)
     name: Mapped[str]  = mapped_column(String, nullable=True)
     surname: Mapped[str] = mapped_column(String, nullable=True)
@@ -22,6 +23,7 @@ class User(Base):  # обязательно наследуем все модел
 
 
 class Task(Base):
+    """Task model"""
     __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
