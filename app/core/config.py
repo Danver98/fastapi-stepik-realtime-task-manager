@@ -53,6 +53,19 @@ class ProdSettings(Settings):
         env_file = ".prod.env"
 
 
+class TestDockerSettings(Settings):
+    """Settings for test docker environment"""
+    class Config:
+        """Config for test docker environment"""
+        env_file = ".test.docker.env"
+
+class DockerSettings(Settings):
+    """Settings for docker environment"""
+    class Config:
+        """Config for docker environment"""
+        env_file = ".docker.env"
+
+
 @lru_cache()
 def get_settings():
     """Get settings for current environment"""
@@ -63,6 +76,10 @@ def get_settings():
         return TestSettings()
     if app_stage == "prod":
         return ProdSettings()
+    if app_stage == "test-docker":
+        return TestDockerSettings()
+    if app_stage == "docker":
+        return DockerSettings()
     return Settings()
 
 

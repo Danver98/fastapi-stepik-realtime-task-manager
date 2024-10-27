@@ -1,0 +1,31 @@
+# Ignore files and directories that are not needed in the Docker image
+
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+
+# Ignore IDE and editor files
+.vscode/
+.pycharm/
+.idea/
+
+
+# Ignore logs and temporary files
+logs/
+tmp/
+
+# Ignore environment files
+.env
+.venv/
+
+# Ignore Docker and Kubernetes files
+Dockerfile
+docker-compose.yml
+kubernetes/
+
+# Ignore FastAPI and Python cache files
+__pycache__/
+.cache/
+
+*.md

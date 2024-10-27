@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    env_file:
+      - ../.test.env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    expose:
+      - 6379
